@@ -1,0 +1,11 @@
+spring:
+   datasource: 
+     username: game_store
+     password: game_store
+     url: jdbc:mysql://localhost:3306/game_store
+  
+   jpa:
+     hibernate:
+        ddl-auto: update
+     show-sql: true
+  
