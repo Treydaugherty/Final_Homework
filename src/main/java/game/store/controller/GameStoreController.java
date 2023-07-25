@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import game.store.controller.model.GameStoreCustomer;
 import game.store.controller.model.GameStoreData;
 import game.store.controller.model.GameStoreEmployee;
+import game.store.controller.model.GameStoreGame;
 import game.store.service.GameStoreService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +30,7 @@ public class GameStoreController {
 	private GameStoreService gameStoreService;
 	
 	//EndPoints for store
+	
 	@PostMapping("/game_store")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public GameStoreData makeStoreData
@@ -44,7 +47,7 @@ public class GameStoreController {
 	
 	@GetMapping("/game_store/{gameStoreId}")
 	public GameStoreData retrieveGameStoreById(@PathVariable Long gameStoreId) {
-	log.info("Retrieving pet store with ID= ", gameStoreId);
+	log.info("Retrieving GameStore with ID= ", gameStoreId);
 	return gameStoreService.retrieveGameStoreById(gameStoreId);
 	}
 	
@@ -64,6 +67,7 @@ public class GameStoreController {
 	}
 	
 	//EndPoints for employee
+	
 	@PostMapping("/game_store/{gameStoreId}/employee")
 	@ResponseStatus(code = HttpStatus.CREATED)
     public GameStoreEmployee newStoreEmployee
@@ -73,10 +77,49 @@ public class GameStoreController {
 		return gameStoreService.saveEmployee(gameStoreId, gameStoreEmployee);
 	}
 	
+	@GetMapping("/game_store/employee/{employeeId}")
+	public GameStoreEmployee retrieveEmployeeById(@PathVariable Long employeeId) {
+	log.info("Retrieving employee with ID= ", employeeId);
+	return gameStoreService.retrieveEmployeeById(employeeId);
+	}
+	
 	@DeleteMapping("/employee/{employeeId}")
 	public Map<String, String> deleteEmployeeById(@PathVariable Long employeeId){
 		log.info("Deleting GameStore employee with ID= {}", employeeId);
 		gameStoreService.deleteEmployeeById(employeeId);
 		return Map.of("message", "deletion is successful " + employeeId);
+	}
+	
+	//EndPpoints for customer
+	
+	@PostMapping("/game_store/{gameStoreId}/customer")
+	@ResponseStatus(code = HttpStatus.CREATED)
+    public GameStoreCustomer newStoreCustomer
+    (@RequestBody GameStoreCustomer gameStoreCustomer) {
+		log.info("Creating customer {} for game store with ID={}");
+		return gameStoreService.saveCustomer(gameStoreCustomer);
+	}
+	
+	//EndPoints for game
+	
+	@PostMapping("/game_store/{gameStoreId}/game")
+	@ResponseStatus(code = HttpStatus.CREATED)
+    public GameStoreGame newStoreGame
+    (@RequestBody GameStoreGame gameStoreGame) {
+		log.info("Creating game {} for game store with ID={}");
+		return gameStoreService.saveGame(gameStoreGame);
+	}
+	
+	@GetMapping("/game_store/game/{gameId}")
+	public GameStoreGame retrieveGameById(@PathVariable Long gameId) {
+	log.info("Retrieving game with ID= ", gameId);
+	return gameStoreService.retrieveGameById(gameId);
+	}
+	
+	@DeleteMapping("/game/{gameId}")
+	public Map<String, String> deleteGameById(@PathVariable Long gameId){
+		log.info("Deleting GameStore game with ID= {}", gameId);
+		gameStoreService.deleteGameById(gameId);
+		return Map.of("message", "deletion is successful " + gameId);
 	}
 }

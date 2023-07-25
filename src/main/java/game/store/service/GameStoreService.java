@@ -9,12 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import game.store.controller.model.GameStoreCustomer;
 import game.store.controller.model.GameStoreData;
 import game.store.controller.model.GameStoreEmployee;
+import game.store.controller.model.GameStoreGame;
+import game.store.dao.CustomerDao;
 import game.store.dao.EmployeeDao;
 import game.store.dao.GameDao;
 import game.store.dao.GameStoreDao;
+import game.store.entity.Customer;
 import game.store.entity.Employee;
+import game.store.entity.Game;
 import game.store.entity.GameStore;
 
 @Service
@@ -26,8 +31,13 @@ public class GameStoreService {
 	private EmployeeDao employeeDao;
 	
 	@Autowired
+	private CustomerDao customerDao;
+	
+	@Autowired
 	private GameDao gameDao;
+	
 	//GameStore methods
+	
 	@Transactional(readOnly = false)
 	public GameStoreData saveGameStore(GameStoreData gameStoreData) {
 		Long gameStoreId = gameStoreData.getGameStoreId();
@@ -88,6 +98,7 @@ public class GameStoreService {
 		gameStoreDao.delete(gameStore);
 	}
 	//Employee methods
+	
 	@Transactional(readOnly = false)
 	public GameStoreEmployee saveEmployee(Long gameStoreId, 
 			GameStoreEmployee gameStoreEmployee) {
@@ -132,7 +143,88 @@ public class GameStoreService {
 				employeeDao.deleteById(dbEmployee.getEmployeeId());
 	}
 
+	@Transactional(readOnly = true)
+	public GameStoreEmployee retrieveEmployeeById(Long employeeId) {
+		
+		return new GameStoreEmployee(findEmployeeById(employeeId));
+	}
+	
+	//Customer methods
 
+	@Transactional(readOnly = false)
+	public GameStoreCustomer saveCustomer(GameStoreCustomer gameStoreCustomer) {
+		Long customerId = gameStoreCustomer.getCustomerId();
+		Customer customer = findOrCreateCustomer(customerId);
+		
+		copyCustomerFields(customer, gameStoreCustomer);
+		return new GameStoreCustomer(customerDao.save(customer));
+	}
+		private void copyCustomerFields(Customer customer, GameStoreCustomer gameStoreCustomer) {
+			customer.setCustomerFirstName(gameStoreCustomer.getCustomerFirstName());
+			customer.setCustomerLastName(gameStoreCustomer.getCustomerLastName());
+		
+	}
 
+		private Customer findOrCreateCustomer(Long customerId) {
+			Customer customer;
+		
+		if(Objects.isNull(customerId)) {
+			customer = new Customer();
+		}else { 
+			customer = findCustomerById(customerId);
+		}
+		return customer;
+	}
 
+	private Customer findCustomerById(Long customerId) {
+		return customerDao.findById(customerId).orElseThrow(() -> 
+			new NoSuchElementException("Customer with ID=" + customerId + 
+					" was not found"));
+	}
+	
+	//Game methods
+	
+	@Transactional(readOnly = false)
+	public GameStoreGame saveGame(GameStoreGame gameStoreGame) {
+		Long gameId = gameStoreGame.getGameId();
+		Game game = findOrCreateGame(gameId);
+		
+		copyGameFields(game, gameStoreGame);
+		return new GameStoreGame(gameDao.save(game));
+	}
+		private void copyGameFields(Game game, GameStoreGame gameStoreGame) {
+			game.setGameName(gameStoreGame.getGameName());
+			game.setGamePrice(gameStoreGame.getGamePrice());
+			game.setGameConsole(gameStoreGame.getGameConsole());
+			game.setNumberOfCopies(gameStoreGame.getNumberOfCopies());
+	}
+
+		private Game findOrCreateGame(Long gameId) {
+			Game game;
+		
+		if(Objects.isNull(gameId)) {
+			game = new Game();
+		}else { 
+			game = findGameById(gameId);
+		}
+		return game;
+	}
+
+	private Game findGameById(Long gameId) {
+		return gameDao.findById(gameId).orElseThrow(() -> 
+			new NoSuchElementException("Game with ID=" + gameId + 
+					" was not found"));
+	}
+
+	@Transactional(readOnly = true)
+	public GameStoreGame retrieveGameById(Long gameId) {
+		
+		return new GameStoreGame(findGameById(gameId));
+	}
+	
+	public void deleteGameById( Long gameId){
+		System.out.println("Delete game = " + gameId);
+				Game dbGame = findGameById(gameId); 
+				gameDao.deleteById(dbGame.getGameId());
+	}
 }

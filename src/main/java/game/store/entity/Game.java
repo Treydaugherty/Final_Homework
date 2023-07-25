@@ -1,4 +1,4 @@
-package game.store.entity;
+ package game.store.entity;
 
 import java.util.HashSet;
 import java.util.Set;
